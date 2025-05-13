@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-// Use environment variable for MongoDB URI (set in Render or locally)
+// Use environment variable for MongoDB URI (set in Render)
 // Example: mongodb+srv://adika713:8h3L3KmeZU8GdUEw@rubensnake.3w8astm.mongodb.net/?retryWrites=true&w=majority&appName=Rubensnake
 const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -60,6 +60,17 @@ app.post('/leaderboard', async (req, res) => {
     res.status(200).json({ message: 'Score updated' });
   } catch (err) {
     console.error('Error updating leaderboard:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET total unique player count
+app.get('/player-count', async (req, res) => {
+  try {
+    const uniquePlayers = await Leaderboard.distinct('name');
+    res.json({ count: uniquePlayers.length });
+  } catch (err) {
+    console.error('Error fetching player count:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
